@@ -1,0 +1,108 @@
+<!doctype html>
+ <html lang="en">
+   <head>
+     <!-- Required meta tags -->
+     <meta charset="utf-8">
+     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+ 
+     <!-- Bootstrap CSS -->
+     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+     
+     <!-- Google Fonts Tags -->
+     <link rel="preconnect" href="https://fonts.googleapis.com">
+     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+     <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Dongle:wght@300;400&family=Roboto+Condensed&display=swap" rel="stylesheet">
+
+     <!-- Font Awesome Tags-->
+     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+
+    </head>
+   <body style="font-family: 'Dongle', sans-serif; ">
+       
+     <!-- Optional JavaScript -->
+     <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+  <div class="row">
+  <div class="col-12" style="background-color: #219F94; color:white;">
+    <br><h3 style="text-align: center; font-family: 'Bebas Neue', cursive; font-size: 70px;" >Online Test Application</h3>
+  </div> 
+   
+  <div class="col-4 text-lg-left" style="font-size: 30px; padding-top: 20px; padding-bottom: 20px;">
+  Select Quiz:
+    <select [(ngModel)]="quizName" (change)="loadQuiz(quizName)">
+      <option *ngFor="let quiz of quizes" [value]="quiz.id">{{quiz.name}}</option>
+    </select>
+ 
+</div>
+</div>
+
+<div id="quiz" >
+  <h2 class="text-center font-weight-normal " style="border:2px solid #AF0069; background-color: #AF0069; font-family: 'Roboto Condensed', sans-serif; font-size: 40px; color:white">{{quiz.name}}</h2>
+  <hr />
+<div  style="background-color:#FFCBCB; font-size: 30px; padding-left: 20px; padding-right: 20px;">
+  <div *ngIf="mode=='quiz' && quiz">
+   <div *ngFor="let question of filteredQuestions;" style="padding-top: 20px;">
+      <div class="badge badge-pill badge-dark" style=" font-weight: normal ;">Question {{pager.index + 1}} of {{pager.count}}</div>
+      <div *ngIf="config.duration" class="badge badge-info float-right" style=" font-weight:normal ;">Time: {{ellapsedTime}} / {{duration}}</div>
+      
+      <h3 style="padding-top: 20px; font-size: 35px;" class="font-weight-normal">{{pager.index + 1}}.
+        <span [innerHTML]="question.name"></span>
+      </h3>    
+
+      <div class="row text-left options" style="padding-top: 10px; padding-bottom: 20px;">
+        <div class="col-6" *ngFor="let option of question.options">
+          <div class="option">
+            <label class="font-weight-normal" [attr.for]="option.id">
+              <input id="{{option.id}}" type="checkbox" [(ngModel)]="option.selected" (change)="onSelect(question, option);" /> {{option.name}}
+            </label>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    <hr />
+    <div class="text-center">
+      <button type="button" class="btn btn-link"  style="font-size: 25px;" *ngIf="config.allowBack" (click)="goTo(0);">First</button>
+      <button class="btn btn-secondary rounded-pill" style="font-size: 25px;  padding-right: 40px; padding-top: 0%; padding-bottom: 0%; margin-left: 10px; margin-right: 10px;" *ngIf="config.allowBack" (click)="goTo(pager.index - 1);"><i class="fa fa-arrow-circle-left" style="padding-right: 10px; padding-top: 10px;"></i> Prev</button>
+      <button class="btn btn-info rounded-pill " style="font-size: 25px; padding-left: 40px; padding-top: 0%; padding-bottom: 0%;  margin-right: 10px;" (click)="goTo(pager.index + 1);">Next <i class="fa fa-arrow-circle-right" style="padding-left: 10px; padding-top: 10px;"></i></button>
+      <button type="button" class="btn btn-link" style="font-size: 25px;" *ngIf="config.allowBack" (click)="goTo(pager.count - 1);">Last</button>
+      <!--<pagination *ngIf="config.showPager" direction-links="false" total-items="totalItems" items-per-page="itemsPerPage" ng-model="currentPage" ng-change="pageChanged()"></pagination>-->
+    </div>
+  
+
+  <br><div class="row text-center" *ngIf="mode=='review'" style="font-size: 30px;">
+    <div class="col-4 cursor-pointer" *ngFor="let question of quiz.questions; let index = index;">
+      <div style="color: white;" (click)="goTo(index)" class="p-1 mb-4 {{ isAnswered(question) == 'Answered'? 'bg-success': 'bg-danger' }}">{{index + 1}}. {{ isAnswered(question) }}</div>
+    </div>
+  </div>
+  <div class="result" *ngIf="mode=='result'"  style="font-size: 30px;">
+    <h2 class="text-center">Quiz Result</h2>
+    <div *ngFor="let question of quiz.questions; let index = index" >
+      <div class="result-question" style=" color:white; padding-left: 20px; padding-top: 20px; background-color: #506D84; ">
+        <h3>{{index + 1}}. {{question.name}}</h3>
+        <div class="row">
+          <div class="col-6" *ngFor="let Option of question.options">
+            <input id="{{Option.id}}" type="checkbox" disabled="disabled" [(ngModel)]="Option.selected" /> {{Option.name}}
+          </div>
+        </div>
+        <div class="p-1 m-2 alert {{ isCorrect(question) == 'correct'? 'alert-success': 'alert-danger'}}">Your answer is {{isCorrect(question)}}.</div>
+      </div>
+    </div>
+    <h4 class="alert alert-info text-center">You may close this window now.</h4>
+  </div>
+  <hr />
+  <div class="container">
+  <div *ngIf="mode!='result'">
+    <button type="button"  style="border-radius: 8px; margin-right: 130px; font-size: 25px;"class=" col-3 btn btn-outline-danger  btn-sm"(click)="mode = 'quiz'">Quiz</button>
+    <button type="button"  style="border-radius: 8px; margin-right: 130px;font-size: 25px;" class="col-3 btn btn-outline-success  btn-sm" (click)="mode = 'review'">Review</button>
+    <button class=" col-3 btn btn-outline-info  btn-sm"  style="border-radius: 8px; font-size: 25px;" (click)="onSubmit();">Submit Quiz</button>
+  
+  </div>
+</div>
+</div>
+<br></body>
+</html>
